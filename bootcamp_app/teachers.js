@@ -10,15 +10,20 @@ const argv = process.argv.slice(2);
 const cohortName = argv[0];
 console.log(cohortName);
 
-pool.query(`
+const queryString = `
 SELECT DISTINCT teachers.name as teacher, cohorts.name as cohort 
 FROM assistance_requests
 JOIN teachers ON teachers.id = teacher_id
 JOIN students ON students.id = student_id
 JOIN cohorts ON cohorts.id = students.cohort_id
-WHERE cohorts.name LIKE '%${cohortName.toUpperCase() || 'JUL02'}%'
+WHERE cohorts.name LIKE '%$1 || 'JUL02'}%'
 ORDER BY teachers.name
-`)
+`;
+
+const cohortName = process.argv[2];
+const values = [`%${cohortName.toUpperCase()}%`];
+
+pool.query(queryString, values)
 .then(res => {
   res.rows.forEach((row) => {
     console.log(`${row.cohort}: ${row.teacher}`);
